@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 
 /**
@@ -22,6 +23,7 @@ public class WifiHotspotFragment extends Fragment {
     private OnWifiHotspotListener mListener;
 
     private Button btn_connect,btn_create;
+    private TextView tv_rssi;
 
     /**
      * Use this factory method to create a new instance of
@@ -46,6 +48,7 @@ public class WifiHotspotFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_wifi_hotspot, container, false);
         btn_connect = (Button)view.findViewById(R.id.btn_connect);
         btn_create = (Button)view.findViewById(R.id.btn_hotspot);
+        tv_rssi = (TextView)view.findViewById(R.id.tv_rssi);
 
         btn_connect.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,6 +80,10 @@ public class WifiHotspotFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    public void setRssi(int level){
+        tv_rssi.setText(level+"");
     }
 
     /**

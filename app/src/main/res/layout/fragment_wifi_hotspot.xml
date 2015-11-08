@@ -20,6 +20,13 @@
             android:layout_height="wrap_content"
             android:text="Create Hotspot"
             android:id="@+id/btn_hotspot"/>
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:padding="30dp"
+            android:id="@+id/tv_rssi"
+            />
     </LinearLayout>
 
 </FrameLayout>

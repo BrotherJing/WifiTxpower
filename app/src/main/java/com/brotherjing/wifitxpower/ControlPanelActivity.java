@@ -1,9 +1,11 @@
 package com.brotherjing.wifitxpower;
 
 import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.wifi.WifiManager;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -78,6 +80,30 @@ public class ControlPanelActivity extends AppCompatActivity implements WifiTxPow
 
     }
 
+    private BroadcastReceiver wifiIntentReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            //int wifi_state = intent.getIntExtra("wifi_state",0);
+            int level = Math.abs(((WifiManager)getSystemService(WIFI_SERVICE)).getConnectionInfo().getRssi());
+            Log.i("yj",level+"");
+            if(mSectionsPagerAdapter.getFragment(1)!=null)
+                ((WifiHotspotFragment)mSectionsPagerAdapter.getFragment(1)).setRssi(level);
+        }
+    };
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(WifiManager.RSSI_CHANGED_ACTION);
+        registerReceiver(wifiIntentReceiver, intentFilter);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(wifiIntentReceiver);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -341,7 +367,7 @@ public class ControlPanelActivity extends AppCompatActivity implements WifiTxPow
             }
         };
         mWifiAdmin.openWifi();
-        mWifiAdmin.addNetwork(mWifiAdmin.createWifiInfo("ssid", "pswd", WifiAdmin.TYPE_WPA));
+        mWifiAdmin.addNetwork(mWifiAdmin.createWifiInfo("HotSpot", "hhhhhh123", WifiAdmin.TYPE_WPA));
     }
 
     @Override
