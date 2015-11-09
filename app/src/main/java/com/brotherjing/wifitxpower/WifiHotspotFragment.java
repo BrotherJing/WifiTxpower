@@ -1,6 +1,7 @@
 package com.brotherjing.wifitxpower;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -8,6 +9,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.utils.ColorTemplate;
 
 
 /**
@@ -22,8 +30,9 @@ public class WifiHotspotFragment extends Fragment {
 
     private OnWifiHotspotListener mListener;
 
-    private Button btn_connect,btn_create;
+    private Button btn_open,btn_connect,btn_create;
     private TextView tv_rssi;
+    private LineChart lineChart;
 
     /**
      * Use this factory method to create a new instance of
@@ -47,9 +56,17 @@ public class WifiHotspotFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_wifi_hotspot, container, false);
         btn_connect = (Button)view.findViewById(R.id.btn_connect);
+        btn_open = (Button)view.findViewById(R.id.btn_open);
         btn_create = (Button)view.findViewById(R.id.btn_hotspot);
         tv_rssi = (TextView)view.findViewById(R.id.tv_rssi);
+        lineChart = (LineChart) view.findViewById(R.id.chart);
 
+        btn_open.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(mListener!=null)mListener.open();
+            }
+        });
         btn_connect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -62,6 +79,9 @@ public class WifiHotspotFragment extends Fragment {
                 if(mListener!=null)mListener.create();
             }
         });
+        LineData data = new LineData();
+        lineChart.setData(data);
+
         return view;
     }
 
@@ -84,6 +104,39 @@ public class WifiHotspotFragment extends Fragment {
 
     public void setRssi(int level){
         tv_rssi.setText(level+"");
+        addEntry(level);
+    }
+
+    private LineDataSet createSet() {
+
+        LineDataSet set = new LineDataSet(null, "Dynamic Data");
+        set.setAxisDependency(YAxis.AxisDependency.LEFT);
+        set.setColor(ColorTemplate.getHoloBlue());
+        set.setCircleColor(ColorTemplate.getHoloBlue());
+        set.setLineWidth(2f);
+        set.setCircleSize(2f);
+        set.setFillAlpha(65);
+        set.setFillColor(ColorTemplate.getHoloBlue());
+        set.setHighLightColor(Color.rgb(244, 117, 117));
+        set.setValueTextColor(Color.WHITE);
+        set.setValueTextSize(9f);
+        set.setDrawValues(false);
+        return set;
+    }
+
+    private void addEntry(int level){
+        LineData data = lineChart.getLineData();
+        if(data!=null){
+            LineDataSet set = data.getDataSetByIndex(0);
+            if(set==null){
+                set=createSet();
+                data.addDataSet(set);
+            }
+            data.addXValue(data.getXValCount()+"");
+            data.addEntry(new Entry(level, set.getEntryCount()), 0);
+            lineChart.notifyDataSetChanged();
+            lineChart.moveViewToX(data.getXValCount()-121);
+        }
     }
 
     /**
@@ -100,6 +153,7 @@ public class WifiHotspotFragment extends Fragment {
         // TODO: Update argument type and name
         void connect();
         void create();
+        void open();
     }
 
 }

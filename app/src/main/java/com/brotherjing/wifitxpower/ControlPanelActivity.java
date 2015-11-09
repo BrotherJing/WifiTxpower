@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -29,11 +31,14 @@ import android.widget.TextView;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class ControlPanelActivity extends AppCompatActivity implements WifiTxPowerFragment.OnWifiTxPowerListener,WifiHotspotFragment.OnWifiHotspotListener{
 
     final private String TAG = "ControlPanel";
 
+    private Timer timer;
     WifiAdmin mWifiAdmin;
 
     /**
@@ -80,31 +85,6 @@ public class ControlPanelActivity extends AppCompatActivity implements WifiTxPow
 
     }
 
-    private BroadcastReceiver wifiIntentReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            //int wifi_state = intent.getIntExtra("wifi_state",0);
-            int level = Math.abs(((WifiManager)getSystemService(WIFI_SERVICE)).getConnectionInfo().getRssi());
-            Log.i("yj",level+"");
-            if(mSectionsPagerAdapter.getFragment(1)!=null)
-                ((WifiHotspotFragment)mSectionsPagerAdapter.getFragment(1)).setRssi(level);
-        }
-    };
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(WifiManager.RSSI_CHANGED_ACTION);
-        registerReceiver(wifiIntentReceiver, intentFilter);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unregisterReceiver(wifiIntentReceiver);
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -127,6 +107,11 @@ public class ControlPanelActivity extends AppCompatActivity implements WifiTxPow
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        timer.cancel();
+    }
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
@@ -335,7 +320,7 @@ public class ControlPanelActivity extends AppCompatActivity implements WifiTxPow
     }
 
     @Override
-    public void connect() {
+    public void open() {
         mWifiAdmin = new WifiAdmin(this) {
 
             @Override
@@ -367,6 +352,13 @@ public class ControlPanelActivity extends AppCompatActivity implements WifiTxPow
             }
         };
         mWifiAdmin.openWifi();
+
+        timer = new Timer();
+        timer.scheduleAtFixedRate(timerTask, 500, 500);
+    }
+
+    @Override
+    public void connect() {
         mWifiAdmin.addNetwork(mWifiAdmin.createWifiInfo("HotSpot", "hhhhhh123", WifiAdmin.TYPE_WPA));
     }
 
@@ -375,4 +367,25 @@ public class ControlPanelActivity extends AppCompatActivity implements WifiTxPow
         WifiApAdmin wifiAp = new WifiApAdmin(this);
         wifiAp.startWifiAp("\"HotSpot\"", "hhhhhh123");
     }
+
+    Handler handler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            if(msg.what==0){
+                int level = msg.arg1;
+                if(mSectionsPagerAdapter.getFragment(1)!=null)
+                    ((WifiHotspotFragment)mSectionsPagerAdapter.getFragment(1)).setRssi(level);
+            }
+        }
+    };
+
+    TimerTask timerTask = new TimerTask() {
+        @Override
+        public void run() {
+            int level = Math.abs(mWifiAdmin.getWifiManager().getConnectionInfo().getRssi());
+            Log.i("yj",level+"");
+            Message msg = handler.obtainMessage(0,level,0);
+            msg.sendToTarget();
+        }
+    };
 }

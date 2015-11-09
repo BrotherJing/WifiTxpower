@@ -70,6 +70,10 @@ public abstract class WifiAdmin {
         }
     }
 
+    public WifiManager getWifiManager(){
+        return mWifiManager;
+    }
+
     public abstract Intent myRegisterReceiver(BroadcastReceiver receiver, IntentFilter filter);
 
     public abstract void myUnregisterReceiver(BroadcastReceiver receiver);

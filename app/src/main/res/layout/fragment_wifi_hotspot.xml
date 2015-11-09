@@ -12,6 +12,12 @@
         <Button
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:text="Open Wifi"
+            android:id="@+id/btn_open"/>
+
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
             android:text="Connect"
             android:id="@+id/btn_connect"/>
 
@@ -27,6 +33,11 @@
             android:padding="30dp"
             android:id="@+id/tv_rssi"
             />
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/chart"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent" />
     </LinearLayout>
 
 </FrameLayout>
