@@ -4,28 +4,34 @@
     tools:context="com.brotherjing.wifitxpower.WifiHotspotFragment">
 
     <!-- TODO: Update blank fragment layout -->
+
+
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:orientation="vertical">
 
-        <Button
+        <GridLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Open Wifi"
-            android:id="@+id/btn_open"/>
+            android:columnCount="3">
+            <Button
+                android:text="Open Wifi"
+                android:id="@+id/btn_open"/>
 
-        <Button
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Connect"
-            android:id="@+id/btn_connect"/>
+            <Button
+                android:text="Connect"
+                android:id="@+id/btn_connect"/>
 
-        <Button
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Create Hotspot"
-            android:id="@+id/btn_hotspot"/>
+            <Button
+                android:text="Create Hotspot"
+                android:id="@+id/btn_hotspot"/>
+
+            <Button
+                android:text="Send packet"
+                android:id="@+id/btn_send"
+                />
+        </GridLayout>
 
         <TextView
             android:layout_width="fill_parent"

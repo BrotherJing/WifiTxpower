@@ -1,11 +1,9 @@
 package com.brotherjing.wifitxpower;
 
 import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.TabLayout;
@@ -20,13 +18,12 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 
-import android.widget.TextView;
+import com.brotherjing.wifitxpower.utils.WifiAdmin;
+import com.brotherjing.wifitxpower.utils.WifiApAdmin;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -34,7 +31,7 @@ import java.io.InputStreamReader;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class ControlPanelActivity extends AppCompatActivity implements WifiTxPowerFragment.OnWifiTxPowerListener,WifiHotspotFragment.OnWifiHotspotListener{
+public class ControlPanelActivity extends AppCompatActivity implements WifiTxPowerFragment.OnWifiTxPowerListener,WifiHotspotFragment.OnWifiHotspotListener,ListenFragment.OnListenListener{
 
     final private String TAG = "ControlPanel";
 
@@ -110,7 +107,7 @@ public class ControlPanelActivity extends AppCompatActivity implements WifiTxPow
     @Override
     protected void onPause() {
         super.onPause();
-        timer.cancel();
+        if(timer!=null)timer.cancel();
     }
 
     /**
@@ -119,11 +116,12 @@ public class ControlPanelActivity extends AppCompatActivity implements WifiTxPow
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
+        private final int COUNT = 3;
         private Fragment[] fragments;
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
-            fragments = new Fragment[2];
+            fragments = new Fragment[COUNT];
         }
 
         @Override
@@ -134,9 +132,12 @@ public class ControlPanelActivity extends AppCompatActivity implements WifiTxPow
                 fragments[0] =WifiTxPowerFragment.newInstance();
                 return fragments[0];
             }
-            else {
+            else if(position==1){
                 fragments[1]=WifiHotspotFragment.newInstance();
                 return fragments[1];
+            }else {
+                fragments[2]=ListenFragment.newInstance();
+                return fragments[2];
             }
         }
 
@@ -147,7 +148,7 @@ public class ControlPanelActivity extends AppCompatActivity implements WifiTxPow
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 2;
+            return COUNT;
         }
 
         @Override
@@ -157,6 +158,8 @@ public class ControlPanelActivity extends AppCompatActivity implements WifiTxPow
                     return "WifiTxPower";
                 case 1:
                     return "Wifi Hotspot";
+                case 2:
+                    return "Listen";
             }
             return null;
         }

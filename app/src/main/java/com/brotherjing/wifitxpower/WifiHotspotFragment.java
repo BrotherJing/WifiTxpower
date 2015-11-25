@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.brotherjing.wifitxpower.utils.UDPSender;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
@@ -30,7 +31,7 @@ public class WifiHotspotFragment extends Fragment {
 
     private OnWifiHotspotListener mListener;
 
-    private Button btn_open,btn_connect,btn_create;
+    private Button btn_open,btn_connect,btn_create,btn_send;
     private TextView tv_rssi;
     private LineChart lineChart;
 
@@ -58,6 +59,7 @@ public class WifiHotspotFragment extends Fragment {
         btn_connect = (Button)view.findViewById(R.id.btn_connect);
         btn_open = (Button)view.findViewById(R.id.btn_open);
         btn_create = (Button)view.findViewById(R.id.btn_hotspot);
+        btn_send = (Button)view.findViewById(R.id.btn_send);
         tv_rssi = (TextView)view.findViewById(R.id.tv_rssi);
         lineChart = (LineChart) view.findViewById(R.id.chart);
 
@@ -77,6 +79,16 @@ public class WifiHotspotFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 if(mListener!=null)mListener.create();
+            }
+        });
+        btn_send.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    UDPSender.send();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
         LineData data = new LineData();
