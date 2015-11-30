@@ -354,10 +354,13 @@ public class ControlPanelActivity extends AppCompatActivity implements WifiTxPow
                 Log.v(TAG, "###############################");
             }
         };
-        mWifiAdmin.openWifi();
+        if(!mWifiAdmin.isWifiOpen())
+            mWifiAdmin.openWifi();
 
-        timer = new Timer();
-        timer.scheduleAtFixedRate(timerTask, 500, 500);
+        if(timer==null) {
+            timer = new Timer();
+            timer.scheduleAtFixedRate(timerTask, 500, 100);
+        }
     }
 
     @Override
@@ -368,7 +371,7 @@ public class ControlPanelActivity extends AppCompatActivity implements WifiTxPow
     @Override
     public void create() {
         WifiApAdmin wifiAp = new WifiApAdmin(this);
-        wifiAp.startWifiAp("\"HotSpot\"", "hhhhhh123");
+        wifiAp.startWifiAp("HotSpot", "hhhhhh123");
     }
 
     Handler handler = new Handler(){
@@ -386,7 +389,8 @@ public class ControlPanelActivity extends AppCompatActivity implements WifiTxPow
         @Override
         public void run() {
             int level = Math.abs(mWifiAdmin.getWifiManager().getConnectionInfo().getRssi());
-            Log.i("yj",level+"");
+            if(level==200)return;
+            //Log.i("yj",level+"");
             Message msg = handler.obtainMessage(0,level,0);
             msg.sendToTarget();
         }

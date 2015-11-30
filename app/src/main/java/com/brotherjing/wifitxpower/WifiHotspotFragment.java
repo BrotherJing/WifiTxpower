@@ -2,8 +2,10 @@ package com.brotherjing.wifitxpower;
 
 import android.app.Activity;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -84,11 +86,18 @@ public class WifiHotspotFragment extends Fragment {
         btn_send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
-                    UDPSender.send();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                    new AsyncTask<Void,Void,Void>(){
+                        @Override
+                        protected Void doInBackground(Void... params) {
+                            try {
+                                UDPSender.send();
+                            } catch (Exception e) {
+                                Log.i("yj","not sent");
+                                e.printStackTrace();
+                            }
+                            return null;
+                        }
+                    }.execute();
             }
         });
         LineData data = new LineData();
@@ -115,7 +124,7 @@ public class WifiHotspotFragment extends Fragment {
     }
 
     public void setRssi(int level){
-        tv_rssi.setText(level+"");
+        tv_rssi.setText(level + "");
         addEntry(level);
     }
 
@@ -125,8 +134,10 @@ public class WifiHotspotFragment extends Fragment {
         set.setAxisDependency(YAxis.AxisDependency.LEFT);
         set.setColor(ColorTemplate.getHoloBlue());
         set.setCircleColor(ColorTemplate.getHoloBlue());
-        set.setLineWidth(2f);
-        set.setCircleSize(2f);
+        set.setLineWidth(1f);
+        set.setDrawCircles(false);
+        set.setDrawCircleHole(false);
+        //set.setCircleSize(2f);
         set.setFillAlpha(65);
         set.setFillColor(ColorTemplate.getHoloBlue());
         set.setHighLightColor(Color.rgb(244, 117, 117));
@@ -146,8 +157,17 @@ public class WifiHotspotFragment extends Fragment {
             }
             data.addXValue(data.getXValCount()+"");
             data.addEntry(new Entry(level, set.getEntryCount()), 0);
+            /*if(data.getXValCount()>200) {
+                data.removeEntry(0, 0);
+                data.removeXValue(0);
+            }*/
+            if(set.getEntryCount()>200){
+                lineChart.clearValues();
+                lineChart.clear();
+                lineChart.setData(new LineData());
+            }
             lineChart.notifyDataSetChanged();
-            lineChart.moveViewToX(data.getXValCount()-121);
+            lineChart.moveViewToX(data.getXValCount() - 121);
         }
     }
 

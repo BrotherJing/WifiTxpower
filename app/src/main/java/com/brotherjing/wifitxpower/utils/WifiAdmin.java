@@ -48,12 +48,16 @@ public abstract class WifiAdmin {
         // 取得WifiInfo对象
         mWifiInfo = mWifiManager.getConnectionInfo();
 
-        Log.v(TAG, "getIpAddress = " + formatIpAddress(mWifiInfo.getIpAddress()));
+        Log.i("yj", "getIpAddress = " + formatIpAddress(mWifiInfo.getIpAddress()));
     }
 
     private String formatIpAddress(int ipAddress){
         return ((ipAddress & 0xff)+"."+(ipAddress>>8 & 0xff)+"."
                 +(ipAddress>>16 & 0xff)+"."+(ipAddress>>24 & 0xff));
+    }
+
+    public boolean isWifiOpen(){
+        return mWifiManager.isWifiEnabled();
     }
 
     // 打开WIFI
@@ -298,6 +302,7 @@ public abstract class WifiAdmin {
 
     private WifiConfiguration IsExsits(String SSID) {
         List<WifiConfiguration> existingConfigs = mWifiManager.getConfiguredNetworks();
+        if(existingConfigs==null||existingConfigs.size()==0)return null;
         for (WifiConfiguration existingConfig : existingConfigs) {
             if (existingConfig.SSID.equals("\"" + SSID + "\"") /*&& existingConfig.preSharedKey.equals("\"" + password + "\"")*/) {
                 return existingConfig;

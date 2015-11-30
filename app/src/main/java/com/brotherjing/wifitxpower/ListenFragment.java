@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -25,9 +26,11 @@ import com.stericson.RootTools.execution.Command;
 import com.stericson.RootTools.execution.Shell;
 import com.tqd.utils.IPSeeker;
 
+import net.sourceforge.jpcap.net.IPPacket;
 import net.sourceforge.jpcap.net.LinkLayer;
 import net.sourceforge.jpcap.net.Packet;
 import net.sourceforge.jpcap.net.PacketFactory;
+import net.sourceforge.jpcap.net.UDPPacket;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -52,6 +55,8 @@ public class ListenFragment extends Fragment {
     public static final String FILE_NAME="qqwry.dat";
     private static final String TAG = "yj";
 
+    private MyRunner mr;
+
     UserHandle userHandle=android.os.Process.myUserHandle();
     ListView mListViewPacket;
     PacketListAdapter pla;
@@ -60,7 +65,10 @@ public class ListenFragment extends Fragment {
     public static long mPacketCount=0;
     public TextView mTVPacketcount;
 
-    private Button btnListen;
+    private String capture_ip = null;
+
+    private EditText etCapture;
+    private Button btnListen,btnClear,btnCapture;
     private TextView tvLog;
     private ScrollView svLog;
 
@@ -86,11 +94,7 @@ public class ListenFragment extends Fragment {
         //RootTools.findBinary("pcap");
         super.onStart();
 
-        //MyRunner是我自己写的一个继承于Runner的类,用来执行命令的一个线程类
-        //本来使用这个的RootTools.runBinary(context, binaryName, parameter);但是不知道命令执行的输出数据，如何获取，
 
-        MyRunner mr=new MyRunner(getActivity(), "/system/xbin/pcap", "");
-        mr.start();
     }
 
     @Override
@@ -104,7 +108,22 @@ public class ListenFragment extends Fragment {
 
     private void initView(View view){
         //tvLog = (TextView)view.findViewById(R.id.tv_log);
+        etCapture = (EditText)view.findViewById(R.id.et_ip);
+        btnCapture = (Button)view.findViewById(R.id.btn_ip);
+        btnClear = (Button)view.findViewById(R.id.btn_clear);
         btnListen = (Button)view.findViewById(R.id.btn_listen);
+        btnListen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //MyRunner是我自己写的一个继承于Runner的类,用来执行命令的一个线程类
+                //本来使用这个的RootTools.runBinary(context, binaryName, parameter);但是不知道命令执行的输出数据，如何获取，
+                if(mr!=null){
+                    return;
+                }
+                mr=new MyRunner(getActivity(), "/system/xbin/pcap", "");
+                mr.start();
+            }
+        });
         //svLog = (ScrollView)view.findViewById(R.id.sv_log);
 
         mTVPacketcount=(TextView) view.findViewById(R.id.packet_count);
@@ -131,6 +150,20 @@ public class ListenFragment extends Fragment {
 
             }
         });
+
+        btnCapture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                capture_ip = etCapture.getText().toString();
+            }
+        });
+        btnClear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pla.clear();
+                mPacketCount = 0;
+            }
+        });
     }
 
     Handler mHandler=new Handler()
@@ -140,9 +173,15 @@ public class ListenFragment extends Fragment {
             if(msg.what==0 && msg.obj instanceof Packet)
             {
                 Packet packet=(Packet) msg.obj;
-                pla.addPacket(packet);
-                mPacketCount++;
-                mTVPacketcount.setText("已抓取"+mPacketCount+"个packet");
+                if(capture_ip!=null){
+                    if(packet instanceof IPPacket){
+                        if(((IPPacket) packet).getSourceAddress().equals(capture_ip)){
+                            pla.addPacket(packet);
+                            mPacketCount++;
+                            mTVPacketcount.setText("已抓取"+mPacketCount+"个packet");
+                        }
+                    }
+                }
 
             }
 

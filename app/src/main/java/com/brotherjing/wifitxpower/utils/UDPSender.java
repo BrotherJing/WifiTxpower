@@ -1,5 +1,7 @@
 package com.brotherjing.wifitxpower.utils;
 
+import android.util.Log;
+
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
@@ -21,6 +23,7 @@ public class UDPSender {
         DatagramPacket dp = new DatagramPacket(msg,msg.length,dst,dstPort);
         multicastSocket.send(dp);
         multicastSocket.close();
+        Log.i("yj","send udp");
     }
 
 }

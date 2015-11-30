@@ -9,11 +9,38 @@
         android:layout_height="fill_parent"
         android:orientation="vertical">
 
-        <Button
+        <EditText
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="start listening"
-            android:id="@+id/btn_listen"/>
+            android:id="@+id/et_ip"/>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/btn_ip"
+                android:text="capture"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="start"
+                android:id="@+id/btn_listen"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="clear"
+                android:id="@+id/btn_clear"/>
+
+        </LinearLayout>
+
+
 
         <TextView
             android:layout_width="fill_parent"

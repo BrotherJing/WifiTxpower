@@ -4,7 +4,7 @@ public class Test {
 
 	public static void main(String[] args) {
 		  IPSeeker ip=new IPSeeker("qqwry.dat","/");  
-	         //²âÊÔIP 58.20.43.13  
+	         //æµ‹è¯•IP 58.20.43.13  
 	System.out.println(ip.getIPLocation("125.88.193.249").getCountry()+":"+ip.getIPLocation("58.20.43.13").getArea());  
 	
 	}
